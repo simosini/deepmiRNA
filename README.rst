@@ -2,14 +2,12 @@
 deepmiRNA
 =========
 
-
-Add a short description here!
-
+A deep learning based tool for miRNA targets prdiction using Keras
 
 Description
 ===========
 
-A longer description of your project goes here...
+... to do .....
 
 
 Note
