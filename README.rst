@@ -2,7 +2,7 @@
 deepmiRNA
 =========
 
-A deep learning based tool for miRNA targets prdiction using Keras
+A deep learning based tool for miRNA targets prediction using Keras
 
 Description
 ===========
