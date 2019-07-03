@@ -4,7 +4,8 @@
 # =============================================================================
 #
 # [for me] Remember to also add them in setup.cfg but unpinned.
-numpy==1.13.3
-scipy==1.0
-Bio==
+numpy==1.16.3
+pandas==0.24.2
+biopython==1.73
 RNA==
+scikit.learn==0.21.1
