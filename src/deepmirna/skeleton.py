@@ -108,6 +108,7 @@ def main(args):
 def run():
     """Entry point for console_scripts
     """
+    configurator.set_global_variables('../../config.ini')
     main(sys.argv[1:])
 
 
