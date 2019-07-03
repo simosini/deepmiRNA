@@ -7,7 +7,7 @@ from ast import literal_eval
 from configparser import ConfigParser
 import logging
 
-import globs as gv
+import deepmirna.globs as gv
 
 __author__ = "simosini"
 __copyright__ = "simosini"
