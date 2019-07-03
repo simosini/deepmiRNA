@@ -9,9 +9,10 @@
 
 # datasets settings
 TEST_SET_COLUMNS = ['mature_miRNA_transcript', '3UTR_transcript', 'functionality'] # test set cols to keep
-TEST_SET_LOCATION = '../../data/test_data.csv' # test set file path
+TEST_SET_LOCATION = '../../../data/test_data.csv' # test set file path
 TRAIN_SET_COLUMNS = ['mature_miRNA_transcript', 'site_transcript', 'functionality'] # train set cols to keep
-TRAIN_SET_LOCATION = '../..data/train_data.csv' # train set file path
+TRAIN_SET_LOCATION = '../../../data/train_data.csv' # train set file path
+TRAIN_MODEL_DIR = '../../../models'
 
 # biological settings
 MBS_LEN = 30 # maximum length for a potential binding site in the mRNA. Must be an even number

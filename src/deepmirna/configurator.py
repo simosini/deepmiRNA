@@ -42,6 +42,7 @@ def set_global_variables(config_file, use_default_values=True):
         # set train set parameters
         gv.TRAIN_SET_LOCATION = train_set_params.get('train_set_location')
         gv.TRAIN_SET_COLUMNS = literal_eval(train_set_params.get('train_set_cols'))
+        gv.TRAIN_MODEL_DIR = train_set_params.get('train_model_dir')
 
         # set miRNA parameters
         gv.SEED_START = int(candidate_sites_params.get('seed_start'))
