@@ -6,13 +6,13 @@
 # PS next version of the tool will also contain a word2vec-like encoding algorithm
 #######################################################################################################################
 
-import pandas as pd
 import numpy as np
 
 # encoders
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
-from deepmirna.globs import MAX_MIRNA_LEN
+from deepmirna.globs import MAX_MIRNA_LEN, MBS_LEN, FLANKING_NUCLEOTIDES_SIZE
+
 
 def init_encoders():
     """
@@ -57,3 +57,35 @@ def one_hot_encode_sequence(sequence, label_encoder, one_hot_encoder, mirna=True
 
     # return result
     return np.ndarray.flatten(ohe_seq)
+
+def encode_data(train_df, encode_method='onehot'):
+    """
+    prepares the dataset for training. It first encode the sequences, according to the chosen encoding
+    method, and then reshapes the examples in order to fit the neural network input layer 
+    :param train_df: the dataframe representing the training set to be used
+    :param encode_method: method to encode duplex: currently only onehot 
+    :return: the training set encoded and ready to be fed to the neural network and the vector of true labels
+    """
+    # check encoding method. Currently 1 method available.
+    method = encode_method.lower()
+    if method != 'onehot':
+        raise AttributeError('Only {} method available'.format('one_hot'))
+
+    # extract values
+    y_train = train_df.functionality.values.astype(np.uint32)
+    mirnas = train_df.mature_mirna_transcript.values
+    binding_sites = train_df.mbs_transcript.values
+
+    sample_num = len(mirnas)
+    sample_size = 4*(MBS_LEN + 2 * FLANKING_NUCLEOTIDES_SIZE + MAX_MIRNA_LEN)
+
+    # init matrix and encoders
+    x_train = np.zeros((sample_num, sample_size))
+    label_enc, ohe_enc = init_encoders()
+
+    # encode sequence
+    for mirna, site, idx in zip(mirnas, binding_sites, range(len(mirnas))):
+        enc_vec = np.concatenate([one_hot_encode_sequence(mirna, label_enc, ohe_enc),
+                                  one_hot_encode_sequence(site, label_enc, ohe_enc, mirna=False)])
+        x_train[idx] = enc_vec
+    return x_train.astype(np.uint32), y_train
