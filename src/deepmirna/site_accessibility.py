@@ -7,13 +7,10 @@
 # Only folds with high site accessibility (i.e. above the given threshold) are kept.
 #################################################################################################
 
-from multiprocessing import Process, Queue
 from subprocess import check_output
 import re
-import ast
 import shlex
 import RNA
-import math
 
 import deepmirna.globs as gv
 
