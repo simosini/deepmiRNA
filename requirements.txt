@@ -7,7 +7,6 @@
 numpy==1.16.3
 pandas>=0.24
 biopython==1.73
-RNA==
 scikit.learn>=0.19
 Keras==2.2.4
 matplotlib>=1.4.3
