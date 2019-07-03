@@ -1,9 +1,9 @@
 #################################################################################################
 # This file sets the global variables to be used across all files of the package. It reads them
-# from config.ini and set the correct values from globs.py
+# from config.ini and sets the correct values in globs.py
 #################################################################################################
-import ast
-import sys
+
+from ast import literal_eval
 from configparser import ConfigParser
 import logging
 
@@ -20,27 +20,28 @@ def set_global_variables(config_file, use_default_values=True):
     sets global variables to be used during the testing phase
     :param config_file: the path to the configuration file
     :param use_default_values: whether to keep default parameters values or not
+           when this value is set to true nothing is done cause default values are already set
     :return: void
     """
     _logger.info(' Setting up global parameters...')
 
-    # read config parameters
-    config = ConfigParser()
-    config.read(config_file)
-    candidate_sites_params = config['candidate_sites']
-    test_set_params = config['testing']
-    train_set_params = config['training']
-    comp = config['computation']
-
-
     if not use_default_values:
+
+        # read config parameters
+        config = ConfigParser()
+        config.read(config_file)
+        candidate_sites_params = config['candidate_sites']
+        test_set_params = config['testing']
+        train_set_params = config['training']
+        comp = config['computation']
+
         # set test set parameters
         gv.TEST_SET_LOCATION = test_set_params.get('test_set_location')
-        gv.TEST_SET_COLUMNS = ast.literal_eval(test_set_params.get('test_set_cols'))
+        gv.TEST_SET_COLUMNS = literal_eval(test_set_params.get('test_set_cols'))
 
         # set train set parameters
         gv.TRAIN_SET_LOCATION = train_set_params.get('train_set_location')
-        gv.TRAIN_SET_COLUMNS = ast.literal_eval(train_set_params.get('train_set_cols'))
+        gv.TRAIN_SET_COLUMNS = literal_eval(train_set_params.get('train_set_cols'))
 
         # set miRNA parameters
         gv.SEED_START = int(candidate_sites_params.get('seed_start'))
@@ -64,11 +65,4 @@ def set_global_variables(config_file, use_default_values=True):
         # set number of cores to use
         gv.MAX_PROCESSES = int(comp.get('max_processes'))
 
-        _logger.info(' Setup complete.')
-
-
-if __name__ == '__main__':
-    try:
-        set_global_variables('../../config.ini', use_default_values=False)
-    except:
-        raise FileNotFoundError('Please provide the configuration file')
+    _logger.info(' Setup complete.')

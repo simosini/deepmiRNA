@@ -6,3 +6,5 @@
 # [for me] Remember to also add them in setup.cfg but unpinned.
 numpy==1.13.3
 scipy==1.0
+Bio==
+RNA==
