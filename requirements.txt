@@ -4,12 +4,14 @@
 # =============================================================================
 #
 # [for me] Remember to also add them in setup.cfg but unpinned.
-numpy==1.16.3
 pandas>=0.24
-biopython==1.73
-scikit.learn>=0.19
-Keras==2.2.4
 matplotlib>=1.4.3
 scipy>=0.15.1
 tqdm>=4.1
-tensorflow==1.13.1
+Keras>=2.0
+setuptools>=38.0
+tensorflow>=1.11
+numpy>=1.7
+Bio==0.1.0
+RNA==0.1.0.dev1
+scikit_learn>=0.19
