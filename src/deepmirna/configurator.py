@@ -38,6 +38,7 @@ def set_global_variables(config_file, use_default_values=True):
         # set test set parameters
         gv.TEST_SET_LOCATION = test_set_params.get('test_set_location')
         gv.TEST_SET_COLUMNS = literal_eval(test_set_params.get('test_set_cols'))
+        gv.BEST_MODEL_LOCATION = test_set_params.get('best_model_location')
 
         # set train set parameters
         gv.TRAIN_SET_LOCATION = train_set_params.get('train_set_location')

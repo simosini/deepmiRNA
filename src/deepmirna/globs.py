@@ -10,6 +10,7 @@
 # datasets settings
 TEST_SET_COLUMNS = ['mature_miRNA_transcript', '3UTR_transcript', 'functionality'] # test set cols to keep
 TEST_SET_LOCATION = '../../../data/test_data.csv' # test set file path
+BEST_MODEL_LOCATION = '../../models/best_model.h5'# the location of the model to test
 TRAIN_SET_COLUMNS = ['mature_miRNA_transcript', 'site_transcript', 'functionality'] # train set cols to keep
 TRAIN_SET_LOCATION = '../../../data/train_data.csv' # train set file path
 TRAIN_MODEL_DIR = '../../../models'
