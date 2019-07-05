@@ -39,11 +39,19 @@ def set_global_variables(config_file, use_default_values=True):
         gv.TEST_SET_LOCATION = test_set_params.get('test_set_location')
         gv.TEST_SET_COLUMNS = literal_eval(test_set_params.get('test_set_cols'))
         gv.BEST_MODEL_LOCATION = test_set_params.get('best_model_location')
+        gv.NROWS = test_set_params.get('nrows')
+        gv.SKIPROWS = test_set_params.get('skiprows')
+        gv.USE_FILTER = test_set_params.getboolean('use_filter')
 
         # set train set parameters
         gv.TRAIN_SET_LOCATION = train_set_params.get('train_set_location')
         gv.TRAIN_SET_COLUMNS = literal_eval(train_set_params.get('train_set_cols'))
         gv.TRAIN_MODEL_DIR = train_set_params.get('train_model_dir')
+        gv.TRAIN_MODEL_NAME = train_set_params.get('train_model_name')
+        gv.TRAIN_FINAL_MODEL_NAME = train_set_params.get('train_final_model_name')
+        gv.BATCH_SIZE = int(train_set_params.get('batch_size'))
+        gv.N_EPOCHS = int(train_set_params.get('n_epochs'))
+        gv.KEEP_PROB = float(train_set_params.get('keep_prob'))
 
         # set miRNA parameters
         gv.SEED_START = int(candidate_sites_params.get('seed_start'))

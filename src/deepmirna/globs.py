@@ -7,13 +7,23 @@
 
 ### DEFAULT VALUES ###
 
-# datasets settings
+# test settings
 TEST_SET_COLUMNS = ['mature_miRNA_transcript', '3UTR_transcript', 'functionality'] # test set cols to keep
-TEST_SET_LOCATION = '../../../data/test_data.csv' # test set file path
-BEST_MODEL_LOCATION = '../../models/best_model.h5'# the location of the model to test
+TEST_SET_LOCATION = '../../data/sample_test.csv' # test set file path
+BEST_MODEL_LOCATION = '../models/best_model.h5'# the location of the model to test
+NROWS = 0 # number of rows to read from the test set. 0 means read the whole dataset
+SKIPROWS = 0 # number of rows to skip from the beginning of the dataset
+USE_FILTER = True # whether to use site accessibility filter or not
+
+# train settings
 TRAIN_SET_COLUMNS = ['mature_miRNA_transcript', 'site_transcript', 'functionality'] # train set cols to keep
-TRAIN_SET_LOCATION = '../../../data/train_data.csv' # train set file path
-TRAIN_MODEL_DIR = '../../../models'
+TRAIN_SET_LOCATION = '../../data/train_data.csv' # train set file path
+TRAIN_MODEL_DIR = '../../models'
+TRAIN_MODEL_NAME = 'model0.h5' # model name for validation
+TRAIN_FINAL_MODEL_NAME = 'final_model.h5' # model name after training over the whole training set
+BATCH_SIZE = 128 # mini-batch size to use for the training
+N_EPOCHS = 15 # number of epochs to ise for training
+KEEP_PROB = 0.7 # dropout rate. Identify the probability to keep a neuron
 
 # biological settings
 MBS_LEN = 30 # maximum length for a potential binding site in the mRNA. Must be an even number
