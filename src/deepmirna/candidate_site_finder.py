@@ -13,8 +13,8 @@ from math import floor
 import RNA
 from Bio.Seq import Seq
 
-import cython_lcs
-import globs as gv
+from deepmirna.cython_lcs import lcs
+import deepmirna.globs as gv
 
 __author__ = "simosini"
 __copyright__ = "simosini"
@@ -38,7 +38,7 @@ def is_complement(mirna_seed, site_transcript):
 
 
     for start in range(len(site_transcript) - seed_len + 1):
-        if cython_lcs.lcs(mirna_seed, site_transcript[start:start+seed_len]) >= min_nucleotides:
+        if lcs(mirna_seed, site_transcript[start:start+seed_len]) >= min_nucleotides:
             return True
     return False
 
