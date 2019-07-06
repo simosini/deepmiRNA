@@ -6,6 +6,10 @@ from deepmirna.train_model import train_model, evaluate_model
 from deepmirna.test_model import  test_model
 import deepmirna.configurator as config
 
+__author__ = "simosini"
+__copyright__ = "simosini"
+__license__ = "mit"
+
 _logger = logging.getLogger(__name__)
 
 def setup_logging():
@@ -23,6 +27,7 @@ def main():
     parser.add_argument('option', choices=['test', 'train', 'train_eval'],
                         help='test, train or train and validate the model')
     args = parser.parse_args()
+
     # default config file location
     config_file = '../../config.ini'
     use_default = True

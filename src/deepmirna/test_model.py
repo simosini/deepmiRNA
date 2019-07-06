@@ -34,6 +34,10 @@ import deepmirna.candidate_site_finder as csf
 import deepmirna.site_accessibility as sa
 import deepmirna.globs as gv
 
+__author__ = "simosini"
+__copyright__ = "simosini"
+__license__ = "mit"
+
 _logger = logging.getLogger(__name__)
 
 def load_test_set(nrows=0, skip=0):
@@ -47,11 +51,11 @@ def load_test_set(nrows=0, skip=0):
     header = ['mature_miRNA_transcript', '3UTR_transcript', 'functionality',]
     if nrows:
         df_test = pd.read_csv(gv.TEST_SET_LOCATION, usecols=gv.TEST_SET_COLUMNS, sep='\t',
-                              nrows=nrows, skiprows=[i for i in range(1, skip)])
+                              nrows=nrows, skiprows=range(1, skip))
         df_test.columns = header
     else:
         df_test = pd.read_csv(gv.TEST_SET_LOCATION, usecols=gv.TEST_SET_COLUMNS, sep='\t',
-                              skiprows=[i for i in range(1, skip)])
+                              skiprows=range(1, skip))
         df_test.columns = header
 
     return df_test
@@ -76,27 +80,27 @@ def _compute_score(model, mirna_transcript, candidate_site, label_encoder, one_h
     score = model.predict(nn_input)
     return score
 
-def predict_single(model, mirna_transcript, three_utr_transcript, label_encoder, one_hot_encoder, use_filter=True):
+def predict_pair(model, mirna_transcript, threeutr_transcript, label_encoder, one_hot_encoder, use_filter=True):
     """
     compute the list of potential candidate sites for the miRNA:gene pair and predict the scores.
     The output will be one iff for at least one candidate the computed score is above the threshold
     and at the same time no scores are below the negative threshold value.
     :param model: the model to use for prediction
     :param mirna_transcript: the mirna transcript
-    :param three_utr_transcript: the full 3UTR transcript sequence
+    :param threeutr_transcript: the full 3UTR transcript sequence
     :param label_encoder: the label_encoder to use
     :param one_hot_encoder: one_hot encoder object to use
     :param use_filter: whether to use the a-posteriori filter or not for classification
     :return: 1 for a functional prediction 0 otherwise
     """
 
-    candidate_dict = csf.find_candidate_sites(mirna_transcript, three_utr_transcript)
+    candidate_dict = csf.find_candidate_sites(mirna_transcript, threeutr_transcript)
     min_site_accessibility = gv.SITE_ACCESSIBILITY_THRESHOLD
     for start_idx, candidate_tuple in candidate_dict.items():
         if _compute_score(model, mirna_transcript, candidate_tuple[0], label_encoder,
                           one_hot_encoder) >= gv.POSITIVE_SCORE_THRESHOLD:
             # check site accessibility if filter is in use
-            if not use_filter or sa.site_accessibility_energy(*sa.create_folding_chunk(start_idx, three_utr_transcript)) > min_site_accessibility:
+            if not use_filter or sa.site_accessibility_energy(*sa.create_folding_chunk(start_idx, threeutr_transcript)) > min_site_accessibility:
                 return 1
 
     return 0
@@ -113,8 +117,8 @@ def predict(model, mirnas, threeutrs, use_filter=True):
 
     preds = [0]*len(mirnas)
     label_encoder, one_hot_encoder = vec.init_encoders()
-    for mirna, threeUTR, idx in zip(tqdm(mirnas), threeutrs, range(len(mirnas))):
-        pred = predict_single(model, mirna, threeUTR, label_encoder, one_hot_encoder, use_filter=use_filter)
+    for mirna, threeutr, idx in zip(tqdm(mirnas), threeutrs, range(len(mirnas))):
+        pred = predict_pair(model, mirna, threeutr, label_encoder, one_hot_encoder, use_filter=use_filter)
         preds[idx] = pred
 
     return preds
@@ -126,16 +130,52 @@ def _compute_metrics(preds, true_labels):
     :param true_labels: the ground truth
     :return: void just print the results on standard output
     """
-    print('######### Confusion matrix ##########')
+    print('\n######### Confusion Matrix ##########\n')
     cm = confusion_matrix(true_labels, preds)
-    print(cm)
+    pretty_print_cm(cm, ['Negative', 'Positive'])
+
+    print('\n######### Main Metrics ##########\n')
     precision, recall, f1score, support = precision_recall_fscore_support(true_labels, preds)
 
     print('precision: {}'.format(precision))
     print('recall: {}'.format(recall))
     print('F1-score: {}'.format(f1score))
     print('support: {}'.format(support))
-    print('Balanced accuracy: {}'.format(balanced_accuracy_score(true_labels, preds)))
+    print('Balanced accuracy: {}\n'.format(balanced_accuracy_score(true_labels, preds)))
+
+def pretty_print_cm(conf_matrix, labels, hide_zeroes=False, hide_diagonal=False, hide_threshold=None):
+    """
+        pretty print for confusion matrices
+    """
+    columnwidth = max([len(x) for x in labels] + [5])  # 5 is value length
+    empty_cell = " " * columnwidth
+
+    # Begin CHANGES
+    fst_empty_cell = (columnwidth-3)//2 * " " + "true/pred" + (columnwidth-3)//2 * " "
+
+    if len(fst_empty_cell) < len(empty_cell):
+        fst_empty_cell = " " * (len(empty_cell) - len(fst_empty_cell)) + fst_empty_cell
+    # Print header
+    print("    " + fst_empty_cell, end=" ")
+    # End CHANGES
+
+    for label in labels:
+        print("%{0}s".format(columnwidth) % label, end=" ")
+
+    print()
+    # Print rows
+    for i, label1 in enumerate(labels):
+        print("    %{0}s".format(columnwidth) % label1, end=" ")
+        for j in range(len(labels)):
+            cell = "%{0}.1f".format(columnwidth) % conf_matrix[i, j]
+            if hide_zeroes:
+                cell = cell if float(conf_matrix[i, j]) != 0 else empty_cell
+            if hide_diagonal:
+                cell = cell if i != j else empty_cell
+            if hide_threshold:
+                cell = cell if conf_matrix[i, j] > hide_threshold else empty_cell
+            print(cell, end=" ")
+        print()
 
 def test_model():
     """
@@ -153,24 +193,24 @@ def test_model():
     _logger.info(' Loading test set ...')
     test_set = load_test_set(nrows=nrows, skip=skiprows)
     c = test_set.functionality.value_counts()
-    _logger.info('The set contains {} positive and {} negative examples'.format(c[1], c[0]))
+    _logger.info(' The set contains {} positive and {} negative examples'.format(c[1], c[0]))
 
-    mirnas = test_set['mature_mirna_transcript'].values
+    mirnas = test_set['mature_miRNA_transcript'].values
     threeutrs = test_set['3UTR_transcript'].values
     labels = test_set['functionality'].values
 
     del test_set
 
-    _logger.info('Prediction {} filter started ...'.format('with' if use_filter else 'without'))
+    _logger.info(' Prediction {} filter started ...'.format('with' if use_filter else 'without'))
     time.sleep(.3) # avoid overlapping output with tqdm
 
     start = datetime.datetime.now()
 
     preds = predict(model, mirnas, threeutrs, use_filter=use_filter)
     time.sleep(.3)
-    _logger.info('It took {} seconds to predict {} duplexes.'.format((datetime.datetime.now() - start).seconds, len(mirnas)))
+    _logger.info(' It took {} seconds to predict {} duplexes.'.format((datetime.datetime.now() - start).seconds, len(mirnas)))
 
     # print results
-    _logger.info('Test prediction complete')
-    _logger.info('Computing metrics ....')
+    _logger.info(' Test prediction complete')
+    _logger.info(' Computing metrics ....')
     _compute_metrics(preds, labels)

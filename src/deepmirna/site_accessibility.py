@@ -14,6 +14,9 @@ import RNA
 
 import deepmirna.globs as gv
 
+__author__ = "simosini"
+__copyright__ = "simosini"
+__license__ = "mit"
 
 def site_accessibility_energy(folding_chunk, site_start, site_end):
     """
@@ -39,12 +42,12 @@ def site_accessibility_energy(folding_chunk, site_start, site_end):
     opening_nrg = float(re.search("[+-]?\d+\.\d+", output).group(0))
     return  reg_nrg - opening_nrg
 
-def create_folding_chunk(chunk_start_idx, three_utr_transcript):
+def create_folding_chunk(chunk_start_idx, threeutr_transcript):
     """
     extracts the region surrounding the MBS to compute its site accessibility 
     :param chunk_start_idx: the starting index of the chunk wrt the beginning of the 3UTR 
-    :param three_utr_transcript: the whole transcript of the 3UTR of the gene
-    :return: the folding chunk and the coordinates of the mbs wrt the beginning of the chunk
+    :param threeutr_transcript: the whole transcript of the 3UTR of the gene
+    :return: the folding chunk and the coordinates of the mbs inside it wrt the beginning of the chunk
     """
 
     # additional nucleotides to consider when computing opening energy
@@ -62,8 +65,8 @@ def create_folding_chunk(chunk_start_idx, three_utr_transcript):
 
     # prepare indexes to check for opening energy
     fc_start = max(0, chunk_start_idx - fc_additional_nts)
-    fc_end = min(len(three_utr_transcript), chunk_start_idx + mbs_len + fc_additional_nts)
-    fc = three_utr_transcript[fc_start:fc_end]
+    fc_end = min(len(threeutr_transcript), chunk_start_idx + mbs_len + fc_additional_nts)
+    fc = threeutr_transcript[fc_start:fc_end]
     mbs_start = min(fc_additional_nts, chunk_start_idx)
     mbs_end = mbs_start + mbs_len
     return fc, mbs_start, mbs_end

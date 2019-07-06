@@ -8,7 +8,6 @@
 
 import sys
 import numpy as np
-import pandas as pd
 
 # encoders
 from sklearn.preprocessing import LabelEncoder, OneHotEncoder
@@ -30,7 +29,7 @@ def check_mirna(mirna_transcript):
     """
     Helper function to check a proper miRNA sequence is passed to encode
     :param mirna_transcript: the mirna sequence
-    :return: raise SystemError if the sequence is bad formed
+    :return: raise SystemExit if the sequence is bad formed
     """
     # check length
     if len(mirna_transcript) > MAX_MIRNA_LEN:
@@ -43,7 +42,7 @@ def check_site(site_transcript):
     """
     Helper function to check a proper site transcript is passed to encode
     :param site_transcript: the site sequence
-    :return: raise SystemError if the sequence is bad formed
+    :return: raise SystemExit if the sequence is bad formed
     """
     tot_mbs_len = 2 * FLANKING_NUCLEOTIDES_SIZE + MBS_LEN
     # check length
@@ -96,6 +95,16 @@ def one_hot_encode_sequence(sequence, label_encoder, one_hot_encoder, mirna=True
     # return result
     return np.ndarray.flatten(ohe_seq)
 
+def check_header(df_columns):
+    """
+    check dataframe columns names are correct wrt to function requirements
+    :param df_columns: the dataframe to check
+    :return: raises SystemExit if column names are incorrect
+    """
+    correct_names = ['mature_miRNA_transcript', 'site_transcript', 'functionality']
+    if not all(n in df_columns for n in correct_names):
+        sys.exit('The dataframe passed has an incorrect header. Header must contain: {}'.format(correct_names))
+
 def encode_data(train_df, encode_method='onehot'):
     """
     prepares the dataset for training. It first encode the sequences, according to the chosen encoding
@@ -113,6 +122,7 @@ def encode_data(train_df, encode_method='onehot'):
     ########### ADD LOGIC TO SAVE ENCODING SO AS TO NOT REPEAT ENCODING EVERY TIME
     ########### WITH THE SAME TRAINING SET #######################################
 
+    check_header(train_df)
     # extract values
     y_train = train_df.functionality.values
     mirnas = train_df.mature_miRNA_transcript.values

@@ -96,14 +96,14 @@ def find_candidates_from_chunk(mirna_transcript, chunk_transcript, chunk_start_i
     # save result to the shared queue
     shared_queue.put(candidates_dict)
 
-def find_candidate_sites(mirna_transcript, three_utr_transcript):
+def find_candidate_sites(mirna_transcript, threeutr_transcript):
     """
     finds all candidate binding sites according to the CSSM provided by the config file.
     The threeUTR is split between a certain number of processes according to its length. 
     The chunks created are overlapping to allow binding sites to be found 
     across 2 consecutive chunks.
     :param mirna_transcript: the miRNA transcript
-    :param three_utr_transcript: the whole transcript of the 3UTR of the gene
+    :param threeutr_transcript: the whole transcript of the 3UTR of the gene
     :return: a dict with all candidate sites found 
     """
 
@@ -120,7 +120,7 @@ def find_candidate_sites(mirna_transcript, three_utr_transcript):
     overlapping_nts =  min_nucleotides - 1
     min_chunk_len = gv.MIN_CHUNK_LEN
     gap =  min_chunk_len - overlapping_nts
-    tot_site_len = len(three_utr_transcript)
+    tot_site_len = len(threeutr_transcript)
     n_proc = floor((tot_site_len - 2 * min_nucleotides) / gap)
 
     # list to collect processes
@@ -130,7 +130,7 @@ def find_candidate_sites(mirna_transcript, three_utr_transcript):
     for proc_id in range(n_proc):
         chunk_start = proc_id*gap
         chunk_end = tot_site_len if tot_site_len - chunk_start < 2 * min_chunk_len else chunk_start + min_chunk_len
-        proc_chunk = three_utr_transcript[chunk_start : chunk_end]
+        proc_chunk = threeutr_transcript[chunk_start : chunk_end]
         p = Process(target=find_candidates_from_chunk, args=(mirna_transcript, proc_chunk, chunk_start, out_q))
         p.start()
         proc_pool.append(p)
