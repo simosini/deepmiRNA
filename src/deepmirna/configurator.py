@@ -39,8 +39,8 @@ def set_global_variables(config_file, use_default_values=True):
         gv.TEST_SET_LOCATION = test_set_params.get('test_set_location')
         gv.TEST_SET_COLUMNS = literal_eval(test_set_params.get('test_set_cols'))
         gv.BEST_MODEL_LOCATION = test_set_params.get('best_model_location')
-        gv.NROWS = test_set_params.get('nrows')
-        gv.SKIPROWS = test_set_params.get('skiprows')
+        gv.NROWS = int(test_set_params.get('nrows'))
+        gv.SKIPROWS = int(test_set_params.get('skiprows'))
         gv.USE_FILTER = test_set_params.getboolean('use_filter')
 
         # set train set parameters
