@@ -25,34 +25,29 @@ def init_encoders():
     one_hot_encoder = OneHotEncoder(sparse=False, categories='auto')
     return integer_encoder, one_hot_encoder
 
-def check_mirna(mirna_transcript):
+def check_sequence(sequence, mirna=True):
     """
     Helper function to check a proper miRNA sequence is passed to encode
-    :param mirna_transcript: the mirna sequence
+    :param sequence: the sequence to check
+    :param mirna: whether is a miRNA sequence or not
     :return: raise SystemExit if the sequence is bad formed
     """
-    # check length
-    if len(mirna_transcript) > MAX_MIRNA_LEN:
-        sys.exit('miRNA sequence too long. Max allowed length: {}'.format(MAX_MIRNA_LEN))
-    # check sequence nucleotides
-    if set('ACGT') != set(mirna_transcript.upper() + 'ACGT'):
-        sys.exit('miRNA must only contain A, C, G or U(T) characters.')
-
-def check_site(site_transcript):
-    """
-    Helper function to check a proper site transcript is passed to encode
-    :param site_transcript: the site sequence
-    :return: raise SystemExit if the sequence is bad formed
-    """
-    tot_mbs_len = 2 * FLANKING_NUCLEOTIDES_SIZE + MBS_LEN
-    # check length
-    if len(site_transcript) != tot_mbs_len:
-        sys.exit('Wrong site transcript. Allowed site length: {}, current site length: {}.'
-                 .format(tot_mbs_len, len(site_transcript)))
-    # check sequence nucleotides
-    if set('ACGT') != set(site_transcript.upper() + 'ACGT'):
-        sys.exit('site transcript must only contain A, C, G or U(T) characters.')
-
+    if mirna:
+        # check length
+        if len(sequence) > MAX_MIRNA_LEN:
+            sys.exit('miRNA sequence too long. Max allowed length: {}'.format(MAX_MIRNA_LEN))
+        # check sequence nucleotides
+        if set('ACGT') != set(sequence.upper() + 'ACGT'):
+            sys.exit('miRNA must only contain A, C, G or U(T) characters.')
+    else: # site transcript
+        tot_mbs_len = 2 * FLANKING_NUCLEOTIDES_SIZE + MBS_LEN
+        # check length
+        if len(sequence) != tot_mbs_len:
+            sys.exit('Wrong site transcript. Allowed site length: {}, current site length: {}.'
+                     .format(tot_mbs_len, len(sequence)))
+        # check sequence nucleotides
+        if set('ACGT') != set(sequence.upper() + 'ACGT'):
+            sys.exit('site transcript must only contain A, C, G or U(T) characters.')
 
 
 def one_hot_encode_sequence(sequence, label_encoder, one_hot_encoder, mirna=True):
@@ -70,12 +65,7 @@ def one_hot_encode_sequence(sequence, label_encoder, one_hot_encoder, mirna=True
     # convert 'U' to 'T' cause we map them to same value
     sequence = sequence.replace('U','T')
 
-    # check sequence
-    if mirna:
-        check_mirna(sequence)
-
-    else: # site transcript
-        check_site(sequence)
+    check_sequence(sequence, mirna=mirna)
 
     # transform the sequence (a string) to a list and then to a numpy array
     # we prepend the string 'ACGT' in order to always obtain the same encoding

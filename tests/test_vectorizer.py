@@ -25,11 +25,12 @@ def test_one_hot_encode_sequence_site_len():
         one_hot_encode_sequence('A'*41, enc0, enc1, mirna=False)
 
 def test_one_hot_encode_sequence_mirna_wellformed():
+    # must not raise exception
     enc0, enc1 = init_encoders()
     raised = False
     try:
         one_hot_encode_sequence('A'*20, enc0, enc1)
-    except:
+    except SystemExit:
         raised = True
     assert raised == False
 
@@ -39,11 +40,12 @@ def test_one_hot_encode_sequence_mirna_badformed():
         one_hot_encode_sequence('H'*20, enc0, enc1)
 
 def test_one_hot_encode_sequence_site_wellformed():
+    # must not raise exception
     enc0, enc1 = init_encoders()
     raised = False
     try:
         one_hot_encode_sequence('A'*40, enc0, enc1, mirna=False)
-    except:
+    except SystemExit:
         raised = True
     assert raised == False
 
