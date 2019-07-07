@@ -9,6 +9,8 @@ from deepmirna.train_model import train_model, evaluate_model
 from deepmirna.test_model import  test_model
 import deepmirna.configurator as config
 
+from deepmirna import __version__
+
 __author__ = "simosini"
 __copyright__ = "simosini"
 __license__ = "mit"
@@ -23,13 +25,27 @@ def setup_logging():
     logging.basicConfig(level=logging.INFO, stream=sys.stdout,
                         format=logformat, datefmt="%Y-%m-%d %H:%M:%S")
 
-def main():
-    setup_logging()
+def parse_arguments(args):
+    """
+    Parse command line parameters
+    :param args: command line parameters as list of strings
+    :return: command line parameters namespace
+    """
+
     parser = ArgumentParser(description='DeepMiRNA : a miRNA target prediction tool.')
+    parser.add_argument(
+        '-v', '--version', help='show current DeepMiRNA version.',
+        action='version', version='deepmiRNA {ver}'.format(ver=__version__))
     parser.add_argument('-c', '--conf', help='allow to specify a configuration file')
     parser.add_argument('option', choices=['test', 'train', 'train_eval'],
                         help='test, train or train and validate the model')
-    args = parser.parse_args()
+    return parser.parse_args(args)
+
+
+
+def main(args):
+    setup_logging()
+    args = parse_arguments(args)
 
     # default config file location
     config_file = os.path.join(ROOT_DIR, 'config.ini')
@@ -55,6 +71,8 @@ def main():
     _logger.info(' Process completed with success. Total computation time: {} seconds'
                  .format((datetime.datetime.now() - start_time).seconds))
 
+def run():
+    main(sys.argv[1:])
 
 if __name__ == '__main__':
-    main()
+    run()
