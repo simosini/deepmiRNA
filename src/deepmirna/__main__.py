@@ -31,13 +31,12 @@ def main():
     # default config file location
     config_file = '../../config.ini'
     use_default = True
+
     if args.conf:
         config_file = args.conf
         use_default = False
-    try:
-        config.set_global_variables(config_file, use_default_values=use_default)
-    except:
-        raise FileNotFoundError('Please specify a configuration file')
+
+    config.set_global_variables(config_file, use_default)
 
     if args.option == 'test':
         _logger.info(' Testing the model...')

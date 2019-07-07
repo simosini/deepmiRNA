@@ -2,12 +2,14 @@
 # This file sets the global variables to be used across all files of the package. It reads them
 # from config.ini and sets the correct values in globs.py
 #################################################################################################
-
+import sys
 from ast import literal_eval
 from configparser import ConfigParser
 import logging
+# import pathlib
 
 import deepmirna.globs as gv
+
 
 __author__ = "simosini"
 __copyright__ = "simosini"
@@ -24,12 +26,19 @@ def set_global_variables(config_file, use_default_values=True):
     :return: void
     """
     _logger.info(' Setting up global parameters...')
+    #_logger.info(' Filepath: {}'.format(pathlib.Path(__file__).parent))
 
     if not use_default_values:
 
+        _logger.info(' Reading configuration file...')
         # read config parameters
         config = ConfigParser()
-        config.read(config_file)
+        exists = config.read(config_file)
+
+        # config.read returns [] if the file does not exist
+        if not exists:
+            sys.exit('Please provide a correct configuration file')
+
         candidate_sites_params = config['candidate_sites']
         test_set_params = config['testing']
         train_set_params = config['training']
@@ -75,4 +84,4 @@ def set_global_variables(config_file, use_default_values=True):
         # set number of cores to use
         gv.MAX_PROCESSES = int(comp.get('max_processes'))
 
-    _logger.info(' Setup complete.')
+    _logger.info(' Setup complete.') 
