@@ -9,7 +9,7 @@
 # 2 - free energy : the free energy must be low (below the chosen threshold) in order
 #                   to consider a duplex stable
 #######################################################################################################################
-
+import os
 import datetime
 import time
 import logging
@@ -48,13 +48,18 @@ def load_test_set(nrows=0, skip=0):
     :param skip: number of lines to skip from the beginning of the dataframe
     :return: the test set
     """
+    # get file path
+    test_set_fp = os.path.join(gv.ROOT_DIR, gv.TEST_SET_LOCATION)
+
+    # in case of user-defined columns names just change them for compatibility
     header = ['mature_miRNA_transcript', '3UTR_transcript', 'functionality',]
+
     if nrows:
-        df_test = pd.read_csv(gv.TEST_SET_LOCATION, usecols=gv.TEST_SET_COLUMNS, sep='\t',
+        df_test = pd.read_csv(test_set_fp, usecols=gv.TEST_SET_COLUMNS, sep='\t',
                               nrows=nrows, skiprows=range(1, skip))
         df_test.columns = header
     else:
-        df_test = pd.read_csv(gv.TEST_SET_LOCATION, usecols=gv.TEST_SET_COLUMNS, sep='\t',
+        df_test = pd.read_csv(test_set_fp, usecols=gv.TEST_SET_COLUMNS, sep='\t',
                               skiprows=range(1, skip))
         df_test.columns = header
 
@@ -132,7 +137,7 @@ def _compute_metrics(preds, true_labels):
     """
     print('\n######### Confusion Matrix ##########\n')
     cm = confusion_matrix(true_labels, preds)
-    pretty_print_cm(cm, ['Negative', 'Positive'])
+    pretty_print_cm(cm, ['Neg', 'Poscat '])
 
     print('\n######### Main Metrics ##########\n')
     precision, recall, f1score, support = precision_recall_fscore_support(true_labels, preds)
@@ -185,7 +190,8 @@ def test_model():
     """
 
     # get testing parameters
-    model = load_model(gv.BEST_MODEL_LOCATION)
+    model_fp = os.path.join(gv.ROOT_DIR, gv.BEST_MODEL_LOCATION)
+    model = load_model(model_fp)
     nrows = gv.NROWS
     skiprows = gv.SKIPROWS
     use_filter = gv.USE_FILTER

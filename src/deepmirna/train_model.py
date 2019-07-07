@@ -2,12 +2,14 @@
 # This file contains the basic utilities to be used to train the MPL neural network
 # and save the best result to file in order to make it available for the testing phase
 ###############################################################################################################
-import datetime
 
-import matplotlib.pyplot as plt
 import logging
-import pandas as pd
+from pathlib import Path
 
+import pandas as pd
+import numpy as np
+import h5py
+import matplotlib.pyplot as plt
 
 # keras utilities
 from keras.models import Sequential
@@ -27,6 +29,10 @@ tf.logging.set_verbosity(tf.logging.ERROR)
 
 import deepmirna.globs as gv
 from deepmirna.vectorizer import encode_data
+
+__author__ = "simosini"
+__copyright__ = "simosini"
+__license__ = "mit"
 
 _logger = logging.getLogger(__name__)
 
@@ -75,7 +81,7 @@ def train_eval(model, model_name, xtrain, ytrain, batch_size=128, n_epochs=15):
     :return: the keras history object containing training performances
     """
     # create output location
-    output_location = os.path.join(gv.TRAIN_MODEL_DIR, model_name)
+    output_location = os.path.join(gv.ROOT_DIR, gv.TRAIN_MODEL_DIR, model_name)
 
     ###### CALLBACKS #######
 
@@ -115,7 +121,7 @@ def train(model, model_name, xtrain, ytrain, batch_size=128, n_epochs=15):
     """
 
     # create output location
-    output_location = os.path.join(gv.TRAIN_MODEL_DIR, model_name)
+    output_location = os.path.join(gv.ROOT_DIR, gv.TRAIN_MODEL_DIR, model_name)
 
     ####### TRAIN THE FINAL MODEL #########
     results = model.fit(xtrain, ytrain,
@@ -124,7 +130,7 @@ def train(model, model_name, xtrain, ytrain, batch_size=128, n_epochs=15):
                         verbose=1)
 
     # save model
-    _logger.info('Saving model ...')
+    _logger.info(' Saving model ...')
     model.save(output_location)
 
     return results
@@ -163,15 +169,33 @@ def evaluate_model():
     """
 
     # get training parameters
-    model_name = gv.TRAIN_MODEL_NAME
+    model_name = gv.TRAIN_FINAL_MODEL_NAME
+    train_set_fp = os.path.join(gv.ROOT_DIR, gv.TRAIN_SET_LOCATION)
+    true_labels_fp = os.path.join(gv.ROOT_DIR, gv.TRUE_LABELS)
+    ohe_duplexes_fp = os.path.join(gv.ROOT_DIR, gv.ONE_HOT_ENCODED_DUPLEXES)
     batch_size = gv.BATCH_SIZE
     n_epochs = gv.N_EPOCHS
     keep_prob = gv.KEEP_PROB
+    training_df = pd.read_csv(train_set_fp, sep='\t', usecols=gv.TRAIN_SET_COLUMNS)
 
-    training_df = pd.read_csv(gv.TRAIN_SET_LOCATION, sep='\t', usecols=gv.TRAIN_SET_COLUMNS)
-    _logger.info(' Encoding the training set. This might take some time')
-    xtrain, ytrain = encode_data(training_df)
+    # check if encoded data already exists
+    if Path(ohe_duplexes_fp).exists():
+        # load data
+        _logger.info(' One-hot encoded training set found. Loading data ...')
+        ytrain = np.loadtxt(true_labels_fp)
+        with h5py.File(ohe_duplexes_fp, 'r') as hf:
+            xtrain = hf['encoded_training_set'][:]
 
+    else :
+        _logger.info(' Encoding the training set. This might take some time')
+        xtrain, ytrain = encode_data(training_df)
+        # save for next computation
+        _logger.info(' Saving encoded data to disk.')
+        np.savetxt(true_labels_fp)
+        with h5py.File(ohe_duplexes_fp, 'w') as hf:
+            hf.create_dataset('encoded_training_set',  data=xtrain)
+
+    _logger.info(' Building and compiling the model')
     model = _create_mlp_model(xtrain.shape[1], keep_prob)
 
     _logger.info(' Training started')
@@ -181,7 +205,7 @@ def evaluate_model():
 
     _logger.info(' model {} saved.'.format(model_name))
     _logger.info(' Best model achieved {:.2f} accuracy and {:.2f} validation loss on the validation set.'
-                 .format(max(history.history['acc']), max(history.history['val_loss'])))
+                 .format(max(history.history['acc']), min(history.history['val_loss'])))
 
     return history
 
@@ -194,13 +218,30 @@ def train_model():
 
     # get training parameters
     model_name = gv.TRAIN_FINAL_MODEL_NAME
+    train_set_fp = os.path.join(gv.ROOT_DIR, gv.TRAIN_SET_LOCATION)
+    true_labels_fp = os.path.join(gv.ROOT_DIR, gv.TRUE_LABELS)
+    ohe_duplexes_fp = os.path.join(gv.ROOT_DIR, gv.ONE_HOT_ENCODED_DUPLEXES)
     batch_size = gv.BATCH_SIZE
     n_epochs = gv.N_EPOCHS
     keep_prob = gv.KEEP_PROB
-    training_df = pd.read_csv(gv.TRAIN_SET_LOCATION, sep='\t', usecols=gv.TRAIN_SET_COLUMNS)
+    training_df = pd.read_csv(train_set_fp, sep='\t', usecols=gv.TRAIN_SET_COLUMNS)
 
-    _logger.info(' Encoding the training set. This might take some time')
-    xtrain, ytrain = encode_data(training_df)
+    # check if encoded data already exists
+    if Path(ohe_duplexes_fp).exists():
+        # load data
+        _logger.info(' One-hot encoded training set found. Loading data ...')
+        ytrain = np.loadtxt(true_labels_fp)
+        with h5py.File(ohe_duplexes_fp, 'r') as hf:
+            xtrain = hf['encoded_training_set'][:]
+
+    else :
+        _logger.info(' Encoding the training set. This might take some time')
+        xtrain, ytrain = encode_data(training_df)
+        # save for next computation
+        _logger.info(' Saving encoded data to disk.')
+        np.savetxt(true_labels_fp, ytrain)
+        with h5py.File(ohe_duplexes_fp, 'w') as hf:
+            hf.create_dataset('encoded_training_set',  data=xtrain)
 
     _logger.info(' Building and compiling the model')
     model = _create_mlp_model(xtrain.shape[1], keep_prob)

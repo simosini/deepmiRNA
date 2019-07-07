@@ -4,10 +4,14 @@
 # config.ini. By default all data used for computation are saved in the data folder contained
 # in the project root directory.
 #################################################################################################
+from pathlib import Path
 
 __author__ = "simosini"
 __copyright__ = "simosini"
 __license__ = "mit"
+
+# project root directory: DO NOT CHANGE THIS
+ROOT_DIR = Path(__file__).parent.parent.parent
 
 ### DEFAULT VALUES ###
 
@@ -22,6 +26,9 @@ USE_FILTER = True # whether to use site accessibility filter or not
 # train settings *****IMPORTANT : all file paths must be relative to the project root directory ******
 TRAIN_SET_COLUMNS = ['mature_miRNA_transcript', 'site_transcript', 'functionality'] # train set cols to keep
 TRAIN_SET_LOCATION = 'data/train_data.csv' # train set file path
+#### IMPORTANT : remove this file (if exists) from the /data directory whenever you change the test set dataset #####
+ONE_HOT_ENCODED_DUPLEXES = 'data/ohe_duplexes.txt.gz' # one_hot encoded training set (to  avoid repeated encodings)
+TRUE_LABELS = 'data/ytrain.txt.gz' # true labels of the training set
 TRAIN_MODEL_DIR = 'models'
 TRAIN_MODEL_NAME = 'model0.h5' # model name for validation: ****CHANGE THIS NAME AT EVERY RUN*****
 TRAIN_FINAL_MODEL_NAME = 'final_model.h5' # model name after training over the whole training set

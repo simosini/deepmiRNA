@@ -14,6 +14,9 @@ from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 
 from deepmirna.globs import MAX_MIRNA_LEN, MBS_LEN, FLANKING_NUCLEOTIDES_SIZE
 
+__author__ = "simosini"
+__copyright__ = "simosini"
+__license__ = "mit"
 
 def init_encoders():
     """

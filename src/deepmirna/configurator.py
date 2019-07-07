@@ -6,7 +6,6 @@ import sys
 from ast import literal_eval
 from configparser import ConfigParser
 import logging
-# import pathlib
 
 import deepmirna.globs as gv
 
@@ -25,12 +24,14 @@ def set_global_variables(config_file, use_default_values=True):
            when this value is set to true nothing is done cause default values are already set
     :return: void
     """
-    _logger.info(' Setting up global parameters...')
-    #_logger.info(' Filepath: {}'.format(pathlib.Path(__file__).parent))
+    _logger.info(' Setting up global parameters ...')
 
-    if not use_default_values:
+    if use_default_values:
+        _logger.info(' Keeping default values.')
 
-        _logger.info(' Reading configuration file...')
+    else:
+
+        _logger.info(' Reading configuration file ...')
         # read config parameters
         config = ConfigParser()
         exists = config.read(config_file)
@@ -54,6 +55,8 @@ def set_global_variables(config_file, use_default_values=True):
 
         # set train set parameters
         gv.TRAIN_SET_LOCATION = train_set_params.get('train_set_location')
+        gv.ONE_HOT_ENCODED_DUPLEXES = train_set_params.get('one_hot_encoded_duplexes')
+        gv.TRUE_LABELS = train_set_params.get('true_labels')
         gv.TRAIN_SET_COLUMNS = literal_eval(train_set_params.get('train_set_cols'))
         gv.TRAIN_MODEL_DIR = train_set_params.get('train_model_dir')
         gv.TRAIN_MODEL_NAME = train_set_params.get('train_model_name')

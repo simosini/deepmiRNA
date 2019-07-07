@@ -12,6 +12,7 @@ Keras>=2.0
 setuptools>=38.0
 tensorflow>=1.11
 numpy>=1.7
+h5py>=2.8
 Bio==0.1.0
 RNA==0.1.0.dev1
 scikit_learn>=0.19

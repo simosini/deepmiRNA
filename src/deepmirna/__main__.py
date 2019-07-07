@@ -1,7 +1,10 @@
 import logging
 import sys
+import os
 from argparse import ArgumentParser
 
+import datetime
+from deepmirna.globs import ROOT_DIR
 from deepmirna.train_model import train_model, evaluate_model
 from deepmirna.test_model import  test_model
 import deepmirna.configurator as config
@@ -29,7 +32,7 @@ def main():
     args = parser.parse_args()
 
     # default config file location
-    config_file = '../../config.ini'
+    config_file = os.path.join(ROOT_DIR, 'config.ini')
     use_default = True
 
     if args.conf:
@@ -38,6 +41,7 @@ def main():
 
     config.set_global_variables(config_file, use_default)
 
+    start_time = datetime.datetime.now()
     if args.option == 'test':
         _logger.info(' Testing the model...')
         test_model()
@@ -48,7 +52,8 @@ def main():
         _logger.info(' Model validation started')
         _ = evaluate_model()
 
-    _logger.info(' Process completed with success')
+    _logger.info(' Process completed with success. Total computation time: {} seconds'
+                 .format((datetime.datetime.now() - start_time).seconds))
 
 
 if __name__ == '__main__':
