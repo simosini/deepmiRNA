@@ -25,7 +25,9 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
-tf.logging.set_verbosity(tf.logging.ERROR)
+
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+#tf.logging.set_verbosity(tf.logging.ERROR)
 
 import deepmirna.globs as gv
 from deepmirna.vectorizer import encode_data
@@ -191,7 +193,7 @@ def evaluate_model():
         xtrain, ytrain = encode_data(training_df)
         # save for next computation
         _logger.info(' Saving encoded data to disk.')
-        np.savetxt(true_labels_fp)
+        np.savetxt(true_labels_fp, ytrain)
         with h5py.File(ohe_duplexes_fp, 'w') as hf:
             hf.create_dataset('encoded_training_set',  data=xtrain)
 
@@ -250,3 +252,10 @@ def train_model():
     history = train(model, model_name, xtrain, ytrain, batch_size, n_epochs)
 
     return history
+"""
+if __name__ == '__main__':
+    from keras.utils import plot_model
+    model = _create_mlp_model(280, 0.7)
+    # save model plot
+    plot_model(model, to_file='../../models/plt_model.png')
+"""

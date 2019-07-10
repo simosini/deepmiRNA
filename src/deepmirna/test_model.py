@@ -27,7 +27,8 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import tensorflow as tf
-tf.logging.set_verbosity(tf.logging.ERROR)
+tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
+#tf.logging.
 
 import deepmirna.vectorizer as vec
 import deepmirna.candidate_site_finder as csf

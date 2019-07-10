@@ -146,3 +146,6 @@ def find_candidate_sites(mirna_transcript, threeutr_transcript):
 
     # return result
     return candidate_sites_dict
+
+if __name__ == '__main__':
+    print(lcs('abc', 'abc'))
