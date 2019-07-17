@@ -71,8 +71,10 @@ def main(args):
     _logger.info(' Process completed with success. Total computation time: {} seconds'
                  .format((datetime.datetime.now() - start_time).seconds))
 
+
 def run():
     main(sys.argv[1:])
+
 
 if __name__ == '__main__':
     run()
